@@ -41,7 +41,7 @@ public:
         m_beg = clock_t::now();
     }
 
-// вывести текущее значение замера, при этом замер приостанавливается
+// выводим текущее значение замера
     long long vuvod()
     {
         long long tmp = 0;
@@ -65,7 +65,7 @@ public:
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
-    const int k = 10000; // количество всех элементов тестируемого массива
+    const int k = 10000; // количество всех элементов тестового массива
     std::array<int, k> arX;
 
     std::cout << "Начало замера" << std::endl;
