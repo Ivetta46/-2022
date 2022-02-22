@@ -1,0 +1,46 @@
+#include <iostream>
+#include <chrono>
+#include <random>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+
+
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const std::vector<T>& vector) {
+    out << '[';
+    std::copy(std::begin(vector), std::prev(std::end(vector)),
+              std::ostream_iterator<T>(out, ", "));
+    return out << *std::prev(std::end(vector)) << ']';
+}
+
+
+int main() {
+    // Создайте последовательность П1 целых чисел от 1 до 10
+    std::vector<int> v(10);
+    std::iota(std::begin(v), std::end(v), 1);
+    std::cout << v << std::endl;
+
+    //Добавьте еще несколько чисел в конец П1 из cin
+    std::copy(std::istream_iterator <int>(std::cin),std::istream_iterator <int>(),std::back_inserter(v));
+
+    //Перемешайте П1 случайным образом
+    std::random_shuffle(std::begin(v), std::end(v));
+
+    //Удалите дубликаты из П1
+    std::sort(v.begin(), v.end());
+    auto last = std::unique(v.begin(), v.end());
+    v.erase(last, v.end());
+    for (auto i = 0; i < std::size(v); ++i)
+    {
+        std::cout << v[i] << " ";
+    }
+
+    //Подсчитайте количество нечетных чисел в П1
+    auto odd_numbers = std::count_if(std::begin(v),
+                                     std::end(v),
+                                      [](auto elem){
+        return (elem % 2 != 0);
+    });
+    std::cout<< odd_numbers<<std::endl;
+}
