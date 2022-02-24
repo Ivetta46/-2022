@@ -1,0 +1,133 @@
+#include <iostream>
+#include <chrono>
+#include <random>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+
+
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const std::vector<T>& vector) {
+    out << '[';
+    std::copy(std::begin(vector), std::prev(std::end(vector)),
+              std::ostream_iterator<T>(out, ", "));
+    return out << *std::prev(std::end(vector)) << ']';
+}
+
+
+int main() {
+    // Создайте последовательность П1 целых чисел от 1 до 10
+    std::vector<int> v(10);
+    std::iota(std::begin(v), std::end(v), 1);
+    std::cout << v << std::endl;
+
+    //Добавьте еще несколько чисел в конец П1 из cin
+    std::copy(std::istream_iterator <int>(std::cin),std::istream_iterator <int>(),std::back_inserter(v));
+
+    //Перемешайте П1 случайным образом
+    std::random_shuffle(std::begin(v), std::end(v));
+
+    //Удалите дубликаты из П1
+    std::sort(v.begin(), v.end());
+    auto last = std::unique(v.begin(), v.end());
+    v.erase(last, v.end());
+    for (auto i = 0; i < std::size(v); ++i)
+    {
+        std::cout << v[i] << " ";
+    }
+
+    //Подсчитайте количество нечетных чисел в П1
+    auto odd_numbers = std::count_if(std::begin(v),
+                                     std::end(v),
+                                      [](auto elem){
+        return (elem % 2 != 0);
+    });
+    std::cout<< odd_numbers<<std::endl;
+
+    //Определите минимальное и максимальное значения в П1
+    const auto [min, max] = std::minmax_element(begin(v), end(v));
+    std::cout << "min = " << *min << ", max = " << *max << '\n';
+
+    //Попробуйте найти хотя бы одно простое число в П1
+    auto is_simple;
+    if(std::find_if(std::begin(v), std::end(v), is_simple) != std::end(v))
+        std::cout<<"Prime number is: "<<std::endl;
+    else {
+        std::cout << "There is no prime number( " << std::endl;
+    }
+
+    //Замените все числа в П1 их квадратами
+    std::for_each_n(std::begin(v),
+                    std::end(v),
+                    [](auto& n){return n *= n; });
+    for (auto n: v) {
+        std::cout << n << ", ";
+    }
+    std::cout << '\n';
+
+    //Создайте последовательность П2 из N случайных чисел, где N - длина П1
+    std::vector<int> random_numbers;
+    auto current_timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto generator = std::mt19937_64(current_timestamp);
+    auto distribution = std::uniform_int_distribution(1, 10);
+    for (auto i = 0; i < std::size(v); i++) {
+        std::cout << distribution(generator) << ' ';
+    }
+    std::cout << std::endl;
+
+    //Вычислите сумму чисел в П2
+    int sum = std::accumulate(std::begin(random_numbers), std::end(random_numbers), 0);
+    std::cout << "sum: " << sum << '\n';
+
+    //Замените первые 3 числа в П2 числом 1
+    std::fill_n(std::begin(random_numbers), 3, 1);
+    std::copy(std::begin(random_numbers), std::end(random_numbers), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << '\n';
+
+    //Создайте последовательность ПЗ как разность П1 и П2
+    std::vector<int> v3;
+    std::transform(std::begin(v),std::end(v),std::begin(random_numbers), std::back_inserter(v3),
+                   [](auto x, auto y){ return x - y; });
+    std::cout<<v3<<std::endl;
+
+    //Заменить каждый отрицательный элемент в ПЗ нулем
+    std::replace_if(std::begin(v3),
+                    std::end(v3),
+                    [](int& elem){ return elem < 0; }, 0);
+    std::cout<<v3<<std::endl;
+
+    //Удалите полностью все нулевые элементы из ПЗ
+    std::remove_if(std::begin(v3),
+                   std::end(v3),
+                   [](int x){return x == 0;});
+    std::cout<<v3<<std::endl;
+
+    //Измените порядок следования элементов в ПЗ на обратный
+    std::reverse(std::begin(v3), std::end(v3));
+    std::cout<<v3<<std::endl;
+
+    //Определите быстро топ-3 наибольших элемента в ПЗ
+    std::nth_element(std::begin(v3),
+                     std::next(std::begin(v3), 2),
+                     std::end(v3),
+                     std::greater<>());
+    std::nth_element(v3.begin(),
+                     std::next(std::begin(v3), 1),
+                     std::end(v3),
+                     std::greater{});
+    for (int elem : v3) std::cout << elem << " ";
+
+    //Отсортируйте полностью П1 и П2 по возрастанию
+    std::sort(std::begin(v), std::end(v));
+    std::sort(std::begin(random_numbers), std::end(random_numbers));
+
+    //Создайте последовательность П4 как слияние П1 и П2
+    std::vector<int> v4;
+    std:: merge(std::begin(v), std::end(v),
+                std::begin(random_numbers), std::end(random_numbers),
+                std::begin(v4));
+    std::cout<<v4<<std::endl;
+
+    //Определите диапазон для упорядоченной вставки числа 1 в П4
+    
+}
