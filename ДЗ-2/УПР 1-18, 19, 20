@@ -129,6 +129,9 @@ int main() {
     std::cout<<v4<<std::endl;
 
     //Определите диапазон для упорядоченной вставки числа 1 в П4
+    std::sort(std::begin(v4), std::end(v4));
+    auto t = std::equal_range(std::begin(v4), std::end(v4), 1);
+    std::cout << "1 is present in the sorted vector from index "<< (t.first - std::begin(v4)) << " till "<< (t.second - std::begin(v4))<< std::endl;
     
     //Выведите все последовательности в cout
     std::cout << "Последовательность П1: " << v << std::endl;
