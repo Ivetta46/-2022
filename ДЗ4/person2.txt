@@ -1,0 +1,1 @@
+[{"age":19,"deti":true,"name":"Peter","rost":165.0,"ves":65.0}]
