@@ -1,0 +1,32 @@
+#include <regex>
+#include <iostream>
+
+std::vector<std::string> search(const std::regex& pattern,
+                                const std::string& text) {
+    auto begin = std::sregex_iterator(std::begin(text),
+                                      std::end(text), pattern);
+    auto end = std::sregex_iterator();
+    std::vector<std::string> results(std::distance(begin, end));
+    std::transform(begin, end, std::back_inserter(results), [](auto x){
+        return x.str();
+    });
+    auto it = std::remove_if(std::begin(results), std::end(results), [](auto item) {
+        return item.empty();
+    });
+    results.erase(it, std::end(results));
+    return results;
+}
+
+int main() {
+    std::regex pattern(R"(((0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|[12][0-9]|3[01]).\d{4}).([0-1]\d|2[0-3])(:[0-5]\d){2})");
+
+    std::string text = "jgtl arig 23.13.35 earg +7900000-00-00 dfmpa +734241"
+                       " +80000000000 27.6.1085 01:42:27 2341241241wfm fgerg wfwertrt"
+                       "+7 00000000030.9.2002 23:34:56 +73000000000 +75000000000"
+                       "89000000000 +7(910)555-55-00";
+
+    auto search_result = search(pattern, text);
+    for(const auto& item: search_result) {
+        std::cout << item << ' ';
+    }
+}
