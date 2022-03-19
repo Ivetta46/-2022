@@ -1,0 +1,48 @@
+#include <iostream>
+#include <future>
+#include <algorithm>
+#include <numeric>
+#include <thread>
+#include <vector>
+#include <cmath>
+
+template<typename Iterator, typename Func>
+void for_each_paral(Iterator beg, Iterator end, Func f) {
+
+	unsigned long  len =  abs(end - beg);
+	if (len == 0) return;
+
+	unsigned long const min_iter = 40;
+
+	if (len < min_iter) {
+		std::for_each(beg, end, f);
+	}
+	else {
+// иначе делим число итераций пополам, половину запускаем в этом потоке,а половину - во втором
+// при этом рекурсивный вызов for_each опять разделит итерации пополам,
+// так будет продолжаться, пока не достигнется минимум
+		Iterator avrg = beg + len / 2;
+
+		std::future <void> new_thr = std::async(std::launch::async, &for_each_paral<Iterator,
+                                                Func>, beg, avrg, f);
+
+		for_each_paral(avrg, end, f);
+		new_thr.get();
+	}
+}
+
+
+int main()
+{
+	int elements = 500;
+	std::vector<double> data(elements);
+	for (int i = 0; i < elements; i++)
+		data[i] = i + 1;
+
+// извлечение квадратного корня выполняется параллельно
+	std::cout << "Parallel computing" << std::endl;
+	for_each_paral(data.begin(), data.end(), [](double &value) { value = sqrt(value); static int i = 1;  std::cout << i++ << " - " << value << std::endl; });
+
+	std::cout << "Checking the correctness of calculations" << std::endl;
+	std::for_each(data.begin(), data.end(), [](double value) {static int i = 1;  std::cout << i++ << " - " << value << std::endl; });
+}
