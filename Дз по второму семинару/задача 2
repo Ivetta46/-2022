@@ -1,1 +1,195 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <Windows.h>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+
+
+class Abonent
+{
+public:
+    Abonent() {}
+
+    Abonent(const Abonent &v)
+    {
+        fam = v.fam;
+        tel = v.tel;
+    }
+
+    std::string get_fam()
+    {
+        return fam;
+    }
+
+    void set_fam(std::string family)
+    {
+        fam = family;
+    }
+
+    std::string get_tel()
+    {
+        return tel;
+    }
+
+    void set_tel(std::string telef)
+    {
+        tel = telef;
+    }
+
+
+    ~Abonent() {}
+
+private:
+    std::string fam;
+    std::string tel;
+
+};
+
+
+class telSpr
+{
+public:
+    std::vector<Abonent> sprav;
+
+    telSpr() {}
+
+    telSpr(const Abonent &v)
+    {
+        sprav.push_back(v);
+    }
+
+    // добавляем запись
+    void insertZap(const Abonent &v)
+    {
+        sprav.push_back(v);
+        sort_spr();
+    }
+
+    // удаляем запись
+    void delZap(int nom)
+    {
+        auto iter = sprav.cbegin();
+        sprav.erase(iter + nom);
+    }
+
+
+    // вывод записей, отсортированных по фамилии
+    void printSprv()
+    {
+        for (int i = 0; i < sprav.size(); ++i)
+            std::cout << i << " " << sprav[i].get_fam() << " " << sprav[i].get_tel() << std::endl;
+        std::cout <<std:: endl;
+    }
+
+    // выбор рандомной записи
+    int rndZap()
+    {
+        int nomZap = getRandomNumber(0, sprav.size()-1);
+        std::cout << nomZap << " " << sprav[nomZap].get_fam() << " " << sprav[nomZap].get_tel() << std::endl;
+
+        return nomZap;
+    }
+
+    // быстрый поиск по фамилии
+    std::pair<std::vector<Abonent>::iterator, std::vector<Abonent>::iterator> poisk(std::string famil)
+    {
+        std::pair<std::vector<Abonent>::iterator, std::vector<Abonent>::iterator> zap;
+        Abonent ttt;
+        ttt.set_fam(famil);
+
+        zap = equal_range(sprav.begin(), sprav.end(), ttt, [](Abonent a, Abonent b) {
+            return a.get_fam() < b.get_fam();
+        });
+
+        if (zap.first != zap.second) {
+            for (int i = (zap.first - sprav.begin()); i < (zap.second - sprav.begin()); ++i)
+                std::cout << i << " " << sprav[i].get_fam() << " " << sprav[i].get_tel() << std::endl;
+            std::cout << std::endl;
+        }
+
+        return zap;
+    }
+
+    ~telSpr() {}
+
+private:
+    void sort_spr()
+    {
+        sort(sprav.begin(), sprav.end(), [](Abonent a, Abonent b) {
+            return a.get_fam() < b.get_fam();
+        });
+
+    }
+
+    // Генерируем рандомное число между значениями min и max
+    int getRandomNumber(int min, int max)
+    {
+        static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
+        //распределение рандомного числа в диапазоне
+        return static_cast<int>(rand() * fraction * (max - min + 1) + min);
+    }
+};
+
+int main()
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    setlocale(LC_ALL, "RUS");
+
+
+    srand(static_cast<unsigned int>(time(0)));
+    int rr = rand();
+
+
+    std::fstream f("tel.txt");
+    telSpr telSprav;
+    while (true)
+    {
+        Abonent t;
+        std::string tmp;
+        f >> tmp;
+        t.set_fam(tmp);
+        if (f.eof()) break;
+        f >> tmp;
+        t.set_tel(tmp);
+        if (f.eof()) break;
+        telSprav.insertZap(t);
+    }
+
+// тестирование п.1 задания - вывод всех записей по алфавиту
+    std::cout << "Тестирование п.1 задания - вывод всех записей по алфавиту" << std::endl;
+    telSprav.printSprv();
+
+// удаление записи по номеру
+    std::cout << "Удаление записи под номером 3" << std::endl;
+    telSprav.delZap(3); // удалили 0-ую запись
+    telSprav.printSprv();
+
+// вставка новой записи
+    std::cout << "Вставка новой записи - Абрамов 5556677" << std::endl;
+    Abonent z;
+    z.set_fam("Абрамов");
+    z.set_tel("5556677");
+    telSprav.insertZap(z);
+    telSprav.printSprv();
+
+// тестирование п.2 задания - вывод рандомной записи
+    std::cout << "Тестирование п.2 задания - вывод рандомных записей" << std::endl;
+    rr = telSprav.rndZap();
+    rr = telSprav.rndZap();
+    rr = telSprav.rndZap();
+
+// тестирование п.3 задания - быстрый поиск по фамилии "Сидоров"
+    std::cout << std::endl << "Тестирование п.3 задания - быстрый поиск по фамилии 'Петров'" << std::endl;
+    std::pair<std::vector<Abonent>::iterator, std::vector<Abonent>::iterator> nom_zap;
+    nom_zap = telSprav.poisk("Петров");
+
+    std::cout << "Нажмите клавишу ENTER для завершения" << std::endl;
+    std::cin.get();
+
+}
 
